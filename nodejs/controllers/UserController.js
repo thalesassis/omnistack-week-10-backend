@@ -30,6 +30,7 @@ module.exports = {
 				try {
 					let storeUser = await User.create({
 						username: req.username,
+						techs: req.techs,
 						bio: gitHubUser.data.bio,
 						avatar_url: gitHubUser.data.avatar_url,
 						location: req.location
