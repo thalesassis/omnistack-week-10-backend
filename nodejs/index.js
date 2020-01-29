@@ -10,4 +10,6 @@ app.use(routes);
  
 connect();
 
-app.listen(3333); 
+let port = process.env.PORT || 8080;
+
+app.listen(port); 
