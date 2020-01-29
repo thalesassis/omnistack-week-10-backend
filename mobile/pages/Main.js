@@ -6,11 +6,14 @@ import KeyboardSpacer from 'react-native-keyboard-spacer';
 import { MaterialIcons } from '@expo/vector-icons';
 import {requestPermissionsAsync, getCurrentPositionAsync} from 'expo-location';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import MultiSelect from 'react-native-multiple-select';
 import api from '../services/api';
 
 function Main({navigation}) {
     const [currentRegion, setCurrentRegion] = useState(null);
+    const [multiSelect, setMultiSelect] = useState(null);
     const [users, setUsers] = useState([]);
+    const [selectedItems, setSelectedItems] = useState([]);
 
     useEffect(()=> { 
         async function loadInitialPosition() { 
@@ -38,15 +41,45 @@ function Main({navigation}) {
         return null;
     }
 
-    async function searchUser() {
+    async function searchUser(searchFor) {
         try {
-            const usersList = await api.get("/users");
-            console.log(usersList.data);
+            const usersList = await api.post("/users", searchFor);
             setUsers(usersList.data);
         } catch(e) {
             console.log(e);
         }
     }
+
+    function onSelectedItemsChange(selectedItems) {
+        setSelectedItems(selectedItems);
+
+        let searchFor = {
+            techs: selectedItems,
+            longitude: currentRegion.longitude,
+            latitude: currentRegion.latitude
+        }
+        searchUser(searchFor);
+    };
+    
+    const items = [{
+        id:'ReactJS',
+        name:'ReactJS'
+    },{
+        id:'React Native',
+        name:'React Native'
+    },{
+        id:'VueJS',
+        name:'VueJS'
+    },{
+        id:'PHP',
+        name:'PHP'
+    },{
+        id:'Angular',
+        name:'Angular'
+    },{
+        id:'Python',
+        name:'Python'
+    }];
 
     return (
     <>
@@ -61,21 +94,40 @@ function Main({navigation}) {
                 <View style={styles.callout}>
                     <Text style={styles.userName}>{user.username}</Text>
                     <Text style={styles.userBio}>{user.bio != null ? user.bio : '(sem bio)'}</Text>
+                    {user.techs.map(tech => (
+                        <Text>{tech}</Text>
+                    ))}
                 </View>
             </Callout>
         </Marker>
         ))}
     </MapView>
     
-    <View style={styles.addMore}>
-        <TouchableOpacity  onPress={() => {
-            navigation.navigate('AddUser');
-        }} style={styles.loadButton}><MaterialIcons name="person-add" size={20} color="#FFF" /></TouchableOpacity>
-    </View>
-    
     <View style={styles.searchBox}>
-        <TextInput style={styles.searchInput} placeholder={'Enter your text!'}/>
-        <TouchableOpacity onPress={()=> searchUser()} style={styles.loadButton}><MaterialIcons name="my-location" size={20} color="#FFF" /></TouchableOpacity>
+        <View style={styles.multiSelectBox}>
+            <MultiSelect
+            hideTags
+            items={items}
+            uniqueKey="id"
+            onChangeInput={searchUser}
+            onSelectedItemsChange={onSelectedItemsChange}
+            ref={(component) => { setMultiSelect(component) }}
+            selectedItems={selectedItems}
+            selectText="Escolha as tecnologias"
+            searchInputPlaceholderText="Procurar..."
+            tagRemoveIconColor="#CCC"
+            tagBorderColor="#CCC"
+            selectedItemTextColor="green"
+            selectedItemIconColor="green"
+            itemTextColor="#000"
+            displayKey="name"
+            submitButtonColor="#000"
+            submitButtonText="Fechar"
+            styleInputGroup={{ paddingTop: 10, paddingBottom: 10, paddingRight: 20 }}
+            styleMainWrapper={styles.searchWrapper}
+            styleDropdownMenuSubsection={styles.searchInput}
+            />
+        </View>
         <KeyboardSpacer topSpacing={40} />
     </View>
 
@@ -84,26 +136,30 @@ function Main({navigation}) {
 } 
 
 const styles = StyleSheet.create({
-    addMore: {
-        position: 'absolute',
-        right: 10,
-        top: 10,
-        zIndex: 5
-    }, 
-    searchBox: {
+    multiSelectBox: {
+        flex: 1,
+        marginLeft: 0,
+        backgroundColor: 'transparent'
+    },
+    searchBox: { 
         flex: 1,
         position: 'absolute',
-        left: 10,
-        right: 10,
+        left: 15,
+        right: 15,
         bottom: 10,
         zIndex: 5,
-        flexDirection: 'row'
+        flexDirection: 'row',
+        backgroundColor: 'transparent'
+    },
+    searchWrapper: {
+        backgroundColor: 'transparent'
+        
     },
     searchInput: {
         flex: 1,
-        height: 40,
+        paddingLeft: 15,
         borderRadius: 10,
-        padding: 10,
+        padding: 0,
         shadowColor: '#000',
         shadowOpacity: 0.2,
         shadowOffset: {

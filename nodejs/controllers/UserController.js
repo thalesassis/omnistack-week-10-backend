@@ -12,6 +12,31 @@ module.exports = {
 		let findUsers = await User.find();
 		return response.json(findUsers);
 	},
+	async search(request,response) {
+		const { techs, longitude, latitude } = request.body;
+
+		const searchFor = {
+			location: {
+				$near: {
+					$geometry: {
+						type: 'Point',
+						coordinates: [longitude, latitude]
+					},
+					$maxDistance: 10000,
+				},
+			},
+		};
+
+		if(techs.length > 0) {
+			searchFor.techs = techs;
+		}
+
+		const findUsers = await User.find(searchFor, function(err, findUsers) {
+			if(err) { res.send(err); } 
+			response.json(findUsers);
+		});
+
+	},
 	async delete(request,response) {
 		req = request.params;
 		let deleteUser = await User.findOneAndDelete({"_id":req.id});
