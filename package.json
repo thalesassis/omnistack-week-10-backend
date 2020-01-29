@@ -1,0 +1,26 @@
+{
+  "name": "oministack-week-10",
+  "version": "1.0.0",
+  "description": "week 10",
+  "main": "nodejs/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thalesassis/oministack-week-10.git"
+  },
+  "author": "Thales",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thalesassis/oministack-week-10/issues"
+  },
+  "homepage": "https://github.com/thalesassis/oministack-week-10#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.8.7"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}
