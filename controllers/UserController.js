@@ -28,7 +28,7 @@ module.exports = {
 		};
 
 		if(techs.length > 0) {
-			searchFor.techs = techs;
+			searchFor.techs = { $in: techs }
 		}
 
 		const findUsers = await User.find(searchFor, function(err, findUsers) {
